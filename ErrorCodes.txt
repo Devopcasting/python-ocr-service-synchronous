@@ -1,0 +1,26 @@
+[Document]
+ERRDOC1 =  Invalid Document
+
+[Pancard]
+ERRPAN1 = Pancard number
+ERRPAN2 = Pancard DOB
+ERRPAN3 = Pancard user name or father's name
+ERRPAN4 = Pancard OCR
+ERRPAN5 = Pancard XML
+
+[E-Aadhaarcard]
+ERREAAD1 = E-Aadhaarcard number
+ERREAAD2 = E-Aadhaarcard Gender
+ERREAAD3 = E-Aadhaarcard name in english
+ERREAAD4 = E-Aadhaarcard name in native language
+ERREAAD5 = E-Aadhaarcard OCR
+ERREAAD6 = E-Aadhaarcard XML
+
+[Aadhaarcard]
+ERRAAD1 = Aadhaarcard number
+ERRAAD2 = Aadhaarcard Gender
+ERRAAD3 = Aadhaarcard name in english
+ERRAAD4 = Aadhaarcard name in native language
+ERRAAD5 = Aadhaarcard OCR
+ERRAAD6 = Aadhaarcard XML
+ERRAAD7 = Invalid Aadhaarcard

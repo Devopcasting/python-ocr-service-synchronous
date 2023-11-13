@@ -2,6 +2,7 @@ import cv2
 import shutil
 import os
 from time import sleep
+from ocrr_log_mgmt.ocrr_log import OCRREngineLogging
 
 class ProcessDocuments:
     def __init__(self, inprogress_queue: object, workspace_path: str, processed_doc_queue: object) -> None:
@@ -11,6 +12,10 @@ class ProcessDocuments:
         # Set Queues
         self.inprogress_queue = inprogress_queue
         self.processed_doc_queue = processed_doc_queue
+
+        # Configure logger
+        log_config = OCRREngineLogging()
+        self.logger = log_config.configure_logger()
 
         # Document processing cv2 values
         self.sigma_x = 1
@@ -35,13 +40,13 @@ class ProcessDocuments:
                     doc_rename = self.__rename_doc(document_path)
                     shutil.move(workspace_path_doc, os.path.join(self.workspace_path, doc_rename))
                     self.processed_doc_queue.put(os.path.join(self.workspace_path, doc_rename))
-                    print(f"Processed : {workspace_path_doc}")
+                    self.logger.info(f"| Document Processed: {workspace_path_doc}")
                 else:
                     doc_rename = self.__rename_doc(document_path)
                     if self.__processed_coloured_docs(workspace_path_doc, doc_rename):
-                        print(f"Processed : {workspace_path_doc}")
+                        self.logger.info(f"| Document Processed: {workspace_path_doc}")
                     else:
-                         print(f"Error Processing : {workspace_path_doc}")
+                        self.logger.error(f"| Error processing docuemnt: {workspace_path_doc}")
             sleep(5)
 
     def __processed_coloured_docs(self, workspace_path_doc, doc_rename) -> bool:

@@ -43,6 +43,7 @@ class OCRREngine:
                 - Aadhaar Card
                 - E-Aadhaar Card
                 - Passport
+            - Perform OCR and write the Coordinates XML data file
         """
         write_xml_data_obj = WriteXMLDatas(self.processed_doc_queue, upload_path)
         write_xml_data_process = mp.Process(target=write_xml_data_obj.xml)
@@ -60,7 +61,6 @@ class OCRREngine:
         process_document_process.start()
         write_xml_data_process.start()
         update_upload_db_thread.start()
-        query_inprogress_thread.join()
 
 if __name__ == '__main__':
     # Read config.ini

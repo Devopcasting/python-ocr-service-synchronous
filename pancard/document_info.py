@@ -5,12 +5,17 @@ from helpers.text_coordinates import TextCoordinates
 from pancard.pattern1 import PanCardPattern1
 from pancard.pattern2 import PanCardPattern2
 from document_db.update_ocrrworkspace import UpdateDocumentStatus
+from ocrr_log_mgmt.ocrr_log import OCRREngineLogging
 
 class PancardDocumentInfo:
     def __init__(self, document_path, upload_path) -> None:
         # Set path
         document_path = document_path
         upload_path = upload_path
+
+        # Configure logger
+        log_config = OCRREngineLogging()
+        self.logger = log_config.configure_logger()
 
         # Set document original path
         document_name_list = os.path.basename(document_path).split('_')
@@ -103,6 +108,7 @@ class PancardDocumentInfo:
         # Collect : PAN card number
         pancard_number = self.__extract_pan_card_num()
         if not pancard_number:
+            self.logger.error(f"| Document Rejected with error ERRPAN1: {self.original_document_path}")
             UpdateDocumentStatus(self.original_document_path, "REJECTED", "ERRPAN1").update_status()
             return pancard_doc_info_list
         pancard_doc_info_list.append(pancard_number)
@@ -110,6 +116,7 @@ class PancardDocumentInfo:
          # Collect : DOB
         pancard_dob = self.__extract_dob()
         if not pancard_dob:
+            self.logger.error(f"| Document Rejected with error ERRPAN2: {self.original_document_path}")
             UpdateDocumentStatus(self.original_document_path, "REJECTED", "ERRPAN2").update_status()
             pancard_doc_info_list = []
             return pancard_doc_info_list
@@ -131,6 +138,7 @@ class PancardDocumentInfo:
                 pancard_doc_info_list.extend(username_p1)
                 pancard_doc_info_list.extend(fathername_p1)
             else:
+                self.logger.error(f"| Document Rejected with error ERRPAN3: {self.original_document_path}")
                 UpdateDocumentStatus(self.original_document_path, "REJECTED", "ERRPAN3").update_status()
                 pancard_doc_info_list = []
                 return pancard_doc_info_list
@@ -142,6 +150,7 @@ class PancardDocumentInfo:
                 pancard_doc_info_list.extend(username_p2)
                 pancard_doc_info_list.extend(fathername_p2)
             else:
+                self.logger.error(f"| Document Rejected with error ERRPAN3: {self.original_document_path}")
                 UpdateDocumentStatus(self.original_document_path, "REJECTED", "ERRPAN3").update_status()
                 pancard_doc_info_list = []
                 return pancard_doc_info_list

@@ -3,6 +3,7 @@ import os
 import shutil
 from pathlib import Path
 from document_identification.identify_documents import DocumentIdentification
+from ocrr_log_mgmt.ocrr_log import OCRREngineLogging
 from pancard.write_xml_data import WritePanCardXMLData
 from aadhaarcard.write_eaadhaarcard_xml_data import WriteEAadhaarCardXMLData
 from aadhaarcard.write_aadhaarcaard_front_xml_data import WriteAadhaarCardFrontXMLData
@@ -16,6 +17,10 @@ class WriteXMLDatas:
         # Set Queues
         self.processed_doc_queue = processed_doc_queue
 
+        # Configure logger
+        log_config = OCRREngineLogging()
+        self.logger = log_config.configure_logger()
+
     def xml(self):
         while True:
             document_path = self.processed_doc_queue.get()
@@ -27,20 +32,20 @@ class WriteXMLDatas:
                 if document_obj.identify_pancard():
                     # Perform OCR and Write XML
                     if WritePanCardXMLData(get_doc_dict, document_path, self.upload_path).writexmldata():
-                        print(f"OCR Performed successfully : {document_path}")
+                        self.logger.info(f"| OCR successful: {document_path}")
                     else:
-                        print(f"Error performing OCR : {document_path}")
+                        self.logger.error(f"| Error performing OCR: {document_path}")
                 elif document_obj.identify_aadhaarcard():
                     if document_obj.identify_eaadhaarcard():
                         if WriteEAadhaarCardXMLData(get_doc_dict, document_path, self.upload_path).writexmldata():
-                            print(f"OCR Performed successfully : {document_path}")
+                            self.logger.info(f"| OCR successful: {document_path}")
                         else:
-                            print(f"Error performaing OCR : {document_path}")
+                            self.logger.error(f"| Error performing OCR: {document_path}")
                     elif document_obj.identify_aadhaarcard_front():
                         if WriteAadhaarCardFrontXMLData(get_doc_dict, document_path, self.upload_path).writexmldata():
-                            print(f"OCR Performed successfully : {document_path}")
+                            self.logger.info(f"| OCR successful: {document_path}")
                         else:
-                            print(f"Error performaing OCR : {document_path}")
+                            self.logger.error(f"| Error performing OCR: {document_path}")
                     else:
                         self.__rejected(get_doc_dict, document_path, "ERRAAD7")
                 else:
@@ -66,5 +71,6 @@ class WriteXMLDatas:
         shutil.move(get_doc_dict["original_document_path"], os.path.join(get_doc_dict["document_rejected_path"], get_doc_dict["original_document_name"]))
         path = Path(document_path)
         path.unlink()
+        self.logger.error(f"| Document Rejected with error {error_code}: {document_path}")
         # Update status of ocrrworkspace-ocrr
         UpdateDocumentStatus(get_doc_dict["original_document_path"], "REJECTED", error_code).update_status()

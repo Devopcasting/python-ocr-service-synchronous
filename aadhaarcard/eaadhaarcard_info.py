@@ -4,12 +4,17 @@ import pytesseract
 from helpers.text_coordinates import TextCoordinates
 from helpers.text_lang_coordinates import TextLangCoordinates
 from document_db.update_ocrrworkspace import UpdateDocumentStatus
+from ocrr_log_mgmt.ocrr_log import OCRREngineLogging
 
 class EAadhaarCardInfo:
     def __init__(self, document_path: str, upload_path: str) -> None:
         self.document_path = document_path
         self.upload_path = upload_path
     
+        # Configure logger
+        log_config = OCRREngineLogging()
+        self.logger = log_config.configure_logger()
+
         # Get coordinates and OCR text output
         self.coordinates = TextCoordinates(self.document_path).generate_text_coordinates()
         self.coordinates_lang = TextLangCoordinates(self.document_path).generate_text_coordinates()
@@ -148,6 +153,7 @@ class EAadhaarCardInfo:
         # Collect: Top side name in native language
         top_side_native_lang_name = self.__top_native_eng_lang_name(1)
         if not top_side_native_lang_name:
+            self.logger.error(f"| Document Rejected with error ERREAAD4: {self.original_document_path}")
             UpdateDocumentStatus(self.original_document_path, "REJECTED", "ERREAAD4").update_status()
             return eaadhaarcard_info_list
         eaadhaarcard_info_list.extend(top_side_native_lang_name)
@@ -155,6 +161,7 @@ class EAadhaarCardInfo:
         # Collect: Top side name in english language
         top_side_eng_lang_name = self.__top_native_eng_lang_name(2)
         if not top_side_eng_lang_name:
+            self.logger.error(f"| Document Rejected with error ERREAAD3: {self.original_document_path}")
             UpdateDocumentStatus(self.original_document_path, "REJECTED", "ERREAAD3").update_status()
             return eaadhaarcard_info_list
         eaadhaarcard_info_list.extend(top_side_eng_lang_name)
@@ -167,6 +174,7 @@ class EAadhaarCardInfo:
         # Collect: E-Aadhaar card Gender
         e_aadhaar_card_gender = self.__extract_gender()
         if not e_aadhaar_card_gender:
+            self.logger.error(f"| Document Rejected with error ERREAAD2: {self.original_document_path}")
             UpdateDocumentStatus(self.original_document_path, "REJECTED", "ERREAAD2").update_status()
             eaadhaarcard_info_list = []
             return eaadhaarcard_info_list
@@ -175,6 +183,7 @@ class EAadhaarCardInfo:
         # Collect: E-Aadhaar card number
         e_aadhaar_card_num = self.__extract_eaadharcard_number("Aadhaar")
         if not e_aadhaar_card_num:
+            self.logger.error(f"| Document Rejected with error ERREAAD1: {self.original_document_path}")
             UpdateDocumentStatus(self.original_document_path, "REJECTED", "ERREAAD1").update_status()
             eaadhaarcard_info_list = []
             return eaadhaarcard_info_list

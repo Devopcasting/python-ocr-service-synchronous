@@ -4,13 +4,17 @@ import os
 from helpers.text_coordinates import TextCoordinates
 from helpers.text_lang_coordinates import TextLangCoordinates
 from document_db.update_ocrrworkspace import UpdateDocumentStatus
-
+from ocrr_log_mgmt.ocrr_log import OCRREngineLogging
 
 class AadhaarCardFrontInfo:
     def __init__(self, document_path: str, upload_path: str) -> None:
         self.document_path = document_path
         self.upload_path = upload_path
     
+        # Configure logger
+        log_config = OCRREngineLogging()
+        self.logger = log_config.configure_logger()
+
         # Get coordinates and OCR text output
         self.coordinates = TextCoordinates(self.document_path).generate_text_coordinates()
         self.coordinates_lang = TextLangCoordinates(self.document_path).generate_text_coordinates()
@@ -180,6 +184,7 @@ class AadhaarCardFrontInfo:
         # Collect: name in native lang
         aadhaar_card_name_native_lang = self.__extract_name(2)
         if not aadhaar_card_name_native_lang:
+            self.logger.error(f"| Document Rejected with error ERRAAD4: {self.original_document_path}")
             UpdateDocumentStatus(self.original_document_path, "REJECTED", "ERRAAD4").update_status()
             return aadhaar_card_info_list
         
@@ -188,6 +193,7 @@ class AadhaarCardFrontInfo:
         # Collect: Name in engish
         aadhaar_card_name_eng = self.__extract_name(1)
         if not aadhaar_card_name_eng:
+            self.logger.error(f"| Document Rejected with error ERRAAD3: {self.original_document_path}")
             UpdateDocumentStatus(self.original_document_path, "REJECTED", "ERRAAD3").update_status()
             aadhaar_card_info_list = []
             return aadhaar_card_info_list
@@ -204,6 +210,7 @@ class AadhaarCardFrontInfo:
         if aadhaar_card_gender:
             aadhaar_card_info_list.append(aadhaar_card_gender)
         else:
+            self.logger.error(f"| Document Rejected with error ERRAAD2: {self.original_document_path}")
             UpdateDocumentStatus(self.original_document_path, "REJECTED", "ERRAAD2").update_status()
             aadhaar_card_info_list = []
             return aadhaar_card_info_list
@@ -213,6 +220,7 @@ class AadhaarCardFrontInfo:
         if aadhaar_card_num:
             aadhaar_card_info_list.append(aadhaar_card_num)
         else:
+            self.logger.error(f"| Document Rejected with error ERRAAD1: {self.original_document_path}")
             UpdateDocumentStatus(self.original_document_path, "REJECTED", "ERRAAD1").update_status()
             aadhaar_card_info_list = []
             return aadhaar_card_info_list

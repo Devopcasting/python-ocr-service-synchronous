@@ -4,7 +4,6 @@ import os
 
 class OCRREngineLogging:
     def __init__(self, log_file='ocrr.log', log_level=logging.INFO) -> None:
-
         # create a ConfigParser object with the allow_no_value keyword argument
         config = configparser.ConfigParser(allow_no_value=True)
         # read config.ini
@@ -18,6 +17,12 @@ class OCRREngineLogging:
         logger = logging.getLogger(__name__)
         logger.setLevel(self.log_level)
 
+        # Check if a file handler already exists
+        for handler in logger.handlers:
+            if isinstance(handler, logging.FileHandler) and handler.baseFilename == self.log_file:
+                return logger
+        
+        # Create a file handler to write logs to a file
         file_handler = logging.FileHandler(self.log_file)
         file_handler.setLevel(self.log_level)
 
@@ -25,6 +30,5 @@ class OCRREngineLogging:
         file_handler.setFormatter(formatter)
 
         logger.addHandler(file_handler)
-
+     
         return logger
-    

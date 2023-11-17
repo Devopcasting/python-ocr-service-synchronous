@@ -28,13 +28,15 @@ class WriteXMLDatas:
                 get_doc_dict = self.__set_orginal_doc_dict(document_path)
                 document_obj = DocumentIdentification(document_path)
 
-                # Identify the document: Pancard
+                # Identify document: Pancard
                 if document_obj.identify_pancard():
                     # Perform OCR and Write XML
                     if WritePanCardXMLData(get_doc_dict, document_path, self.upload_path).writexmldata():
                         self.logger.info(f"| OCR successful: {document_path}")
                     else:
                         self.logger.error(f"| Error performing OCR: {document_path}")
+                        
+                # Identify document: Aadhaar card
                 elif document_obj.identify_aadhaarcard():
                     if document_obj.identify_eaadhaarcard():
                         if WriteEAadhaarCardXMLData(get_doc_dict, document_path, self.upload_path).writexmldata():

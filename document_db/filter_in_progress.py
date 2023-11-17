@@ -55,7 +55,7 @@ class FilterInProgress:
                 "taskId": taskid,
                 "path": document_path,
                 "status": status,
-                "clientid": clientid,
+                "clientId": clientid,
                 "taskResult": ""
             }
             self.collection_ocrrworkspace.insert_one(document)

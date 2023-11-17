@@ -1,5 +1,7 @@
 from document_db.connect import MongoDBConnection
 from time import sleep
+import requests
+import json
 
 class UpdateUploadFileDetailsDB:
     def __init__(self) -> None:
@@ -16,14 +18,16 @@ class UpdateUploadFileDetailsDB:
             documents = collection.find(query)
             result = []
             for document in documents:
+                client_id = document["clientId"]
                 docs = {
                     "taskId": document['taskId'],
                     "status": document["status"],
                     "taskResult": document["taskResult"]
                 }
                 if self.__update_upload_filedetails(docs):
-                    remove_query = {"taskId": document['taskId']}
-                    collection.delete_one(remove_query)
+                    if self.__webhook_post_request(client_id, docs):
+                        remove_query = {"taskId": document['taskId']}
+                        collection.delete_one(remove_query)
             sleep(5)
     
     def __update_upload_filedetails(self, docinfo: dict) -> bool:
@@ -39,3 +43,19 @@ class UpdateUploadFileDetailsDB:
             return True
         else:
             return False
+    
+    def __webhook_post_request(self, clientid, payload: dict) -> bool:
+        # Filter the clientId from upload:webhook
+        filter = {"clientId": clientid}
+        database = self.client["upload"]
+        collection = database["webhook"]
+        client_doc = collection.find_one(filter)
+
+        WEBHOOK_URL = client_doc["url"]
+        HEADER = {'Content-Type': 'application/json'}
+        response = requests.post(WEBHOOK_URL, data=json.dumps(payload), headers=HEADER)
+        if response.status_code == 201 or response.status_code == 200 :
+            return True
+        else:
+            return False
+        

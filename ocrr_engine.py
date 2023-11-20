@@ -61,6 +61,7 @@ class OCRREngine:
         process_document_process.start()
         write_xml_data_process.start()
         update_upload_db_thread.start()
+        query_inprogress_thread.join()
 
 if __name__ == '__main__':
     # Read config.ini

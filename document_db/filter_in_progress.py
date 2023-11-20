@@ -43,7 +43,7 @@ class FilterInProgress:
                 document_sub_path = ""
                 document_path = ""
                 document_path_list = []
-            sleep(10)
+            sleep(2)
 
     
     # Insert new IN_PROGRESS document information in ocrrworkspace-ocrr.

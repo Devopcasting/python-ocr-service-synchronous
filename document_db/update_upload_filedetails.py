@@ -16,7 +16,6 @@ class UpdateUploadFileDetailsDB:
 
         while True:
             documents = collection.find(query)
-            result = []
             for document in documents:
                 client_id = document["clientId"]
                 docs = {
@@ -31,14 +30,14 @@ class UpdateUploadFileDetailsDB:
             sleep(5)
     
     def __update_upload_filedetails(self, docinfo: dict) -> bool:
-        filter = {"taskId": docinfo['taskId']}
+        filter_query = {"taskId": docinfo['taskId']}
         update = {"$set" : {
             "status": docinfo['status'],
             "taskResult": docinfo['taskResult']
         }}
         database = self.client["upload"]
         collection = database["fileDetails"]
-        result = collection.update_one(filter, update)
+        result = collection.update_one(filter_query, update)
         if result:
             return True
         else:
@@ -46,10 +45,10 @@ class UpdateUploadFileDetailsDB:
     
     def __webhook_post_request(self, clientid, payload: dict) -> bool:
         # Filter the clientId from upload:webhook
-        filter = {"clientId": clientid}
+        filter_query = {"clientId": clientid}
         database = self.client["upload"]
         collection = database["webhook"]
-        client_doc = collection.find_one(filter)
+        client_doc = collection.find_one(filter_query)
 
         WEBHOOK_URL = client_doc["url"]
         HEADER = {'Content-Type': 'application/json'}

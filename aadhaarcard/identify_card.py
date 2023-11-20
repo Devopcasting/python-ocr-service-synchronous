@@ -3,7 +3,7 @@ class IdentifyAadhaarCard:
         self.clean_text = clean_text
         # Search keyword for Aadhaar card
         self.aadhaar_card_identifiers = ["government", "government of india", "male", "female", "help@uidal.gov.in", 
-                                         "www.uidal.gov.in", "unique identification authority of india" "enrollment", "aadhaar"]
+                                         "www.uidal.gov.in", "unique identification authority of india", "enrollment", "aadhaar"]
         self.aadhaar_card_identifiers_front = ["government", "government of india", "male", "female"]
         self.eaadhaar_card_identifiers = ["enrollment", "vid:", "enrolment"]
     

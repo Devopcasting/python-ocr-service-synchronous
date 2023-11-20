@@ -35,21 +35,23 @@ class WriteEAadhaarCardXMLData:
             return False
     
     def __redacted(self):
-        # Move the original document to Redacted folder
-        shutil.move(self.get_doc_dict["original_document_path"], os.path.join(self.get_doc_dict["document_redacted_path"], self.get_doc_dict["original_document_name"]))
-        # Delete document from workspace
-        path = Path(self.document_path)
-        path.unlink()
-        self.logger.info(f"| Document Redacted successfully: {self.get_doc_dict["original_document_path"]}")
-        # Update status of ocrrworkspace-ocrr
-        UpdateDocumentStatus(self.get_doc_dict["original_document_path"], "REDACTED", "Uploaded Successfully").update_status()
+        if os.path.exists(self.document_path):
+            # Move the original document to Redacted folder
+            shutil.move(self.get_doc_dict["original_document_path"], os.path.join(self.get_doc_dict["document_redacted_path"], self.get_doc_dict["original_document_name"]))
+            # Delete document from workspace
+            path = Path(self.document_path)
+            path.unlink()
+            self.logger.info(f"| Document Redacted successfully: {self.get_doc_dict["original_document_path"]}")
+            # Update status of ocrrworkspace-ocrr
+            UpdateDocumentStatus(self.get_doc_dict["original_document_path"], "REDACTED", "Uploaded Successfully").update_status()
     
     def __rejected(self, error_code: str):
-        # Move the original document to Rejected folder
-        shutil.move(self.get_doc_dict["original_document_path"], os.path.join(self.get_doc_dict["document_rejected_path"], self.get_doc_dict["original_document_name"]))
-        path = Path(self.document_path)
-        path.unlink()
-        self.logger.error(f"| Document Rejected with error {error_code}: {self.get_doc_dict["original_document_path"]}")
-        # Update status of ocrrworkspace-ocrr
-        UpdateDocumentStatus(self.get_doc_dict["original_document_path"], "REJECTED", error_code).update_status()
+        if os.path.exists(self.document_path):
+            # Move the original document to Rejected folder
+            shutil.move(self.get_doc_dict["original_document_path"], os.path.join(self.get_doc_dict["document_rejected_path"], self.get_doc_dict["original_document_name"]))
+            path = Path(self.document_path)
+            path.unlink()
+            self.logger.error(f"| Document Rejected with error {error_code}: {self.get_doc_dict["original_document_path"]}")
+            # Update status of ocrrworkspace-ocrr
+            UpdateDocumentStatus(self.get_doc_dict["original_document_path"], "REJECTED", error_code).update_status()
 

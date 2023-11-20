@@ -9,10 +9,6 @@ from ocrr_log_mgmt.ocrr_log import OCRREngineLogging
 
 class PancardDocumentInfo:
     def __init__(self, document_path, upload_path) -> None:
-        # Set path
-        document_path = document_path
-        upload_path = upload_path
-
         # Configure logger
         log_config = OCRREngineLogging()
         self.logger = log_config.configure_logger()

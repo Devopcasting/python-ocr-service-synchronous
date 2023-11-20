@@ -27,33 +27,42 @@ class WriteXMLDatas:
             if document_path is not None:
                 get_doc_dict = self.__set_orginal_doc_dict(document_path)
                 document_obj = DocumentIdentification(document_path)
-
                 # Identify document: Pancard
                 if document_obj.identify_pancard():
-                    # Perform OCR and Write XML
-                    if WritePanCardXMLData(get_doc_dict, document_path, self.upload_path).writexmldata():
-                        self.logger.info(f"| OCR successful: {document_path}")
-                    else:
-                        self.logger.error(f"| Error performing OCR: {document_path}")
-                        
+                    self.__process_pancard(get_doc_dict, document_path) 
                 # Identify document: Aadhaar card
                 elif document_obj.identify_aadhaarcard():
                     if document_obj.identify_eaadhaarcard():
-                        if WriteEAadhaarCardXMLData(get_doc_dict, document_path, self.upload_path).writexmldata():
-                            self.logger.info(f"| OCR successful: {document_path}")
-                        else:
-                            self.logger.error(f"| Error performing OCR: {document_path}")
+                          self.__process_eaadhaarcard(get_doc_dict, document_path)
                     elif document_obj.identify_aadhaarcard_front():
-                        if WriteAadhaarCardFrontXMLData(get_doc_dict, document_path, self.upload_path).writexmldata():
-                            self.logger.info(f"| OCR successful: {document_path}")
-                        else:
-                            self.logger.error(f"| Error performing OCR: {document_path}")
+                        self.__process_aadhaarcard_front(get_doc_dict, document_path)
                     else:
                         self.__rejected(get_doc_dict, document_path, "ERRAAD7")
                 else:
                     self.__rejected(get_doc_dict, document_path, "ERRDOC1")
             sleep(10)
     
+    def __process_pancard(self, get_doc_dict,  document_path):
+        # Perform OCR and Write XML
+        if WritePanCardXMLData(get_doc_dict, document_path, self.upload_path).writexmldata():
+            self.logger.info(f"| OCR successful: {document_path}")
+        else:
+            self.logger.error(f"| Error performing OCR: {document_path}")
+
+    def __process_eaadhaarcard(self, get_doc_dict, document_path):
+        # Perform OCR and Write XML
+        if WriteEAadhaarCardXMLData(get_doc_dict, document_path, self.upload_path).writexmldata():
+            self.logger.info(f"| OCR successful: {document_path}")
+        else:
+            self.logger.error(f"| Error performing OCR: {document_path}")
+
+    def __process_aadhaarcard_front(self, get_doc_dict, document_path):
+        # Perform OCR and Write XM
+        if WriteAadhaarCardFrontXMLData(get_doc_dict, document_path, self.upload_path).writexmldata():
+            self.logger.info(f"| OCR successful: {document_path}")
+        else:
+            self.logger.error(f"| Error performing OCR: {document_path}")
+
     def __set_orginal_doc_dict(self, document_path) -> dict:
         document_name_list = os.path.basename(document_path).split('_')
         original_document_name = document_name_list[2]

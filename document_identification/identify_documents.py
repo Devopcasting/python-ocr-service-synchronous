@@ -25,23 +25,19 @@ class DocumentIdentification:
     def identify_pancard(self) -> bool:
         if self.pancard_obj.check_pan_card():
             return True
-        else:
-            return False
+        return False
     
     def identify_aadhaarcard(self):
         if self.aadhaarcard_obj.check_aadhaar_card():
             return True
-        else:
-            return False
+        return False
     
     def identify_eaadhaarcard(self):
         if self.aadhaarcard_obj.check_e_aadhaar_card():
             return True
-        else:
-            return False
+        return False
     
     def identify_aadhaarcard_front(self):
         if self.aadhaarcard_obj.check_aadhaar_front():
             return True
-        else:
-            return False
+        return False

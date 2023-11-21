@@ -38,8 +38,9 @@ class FilterInProgress:
                 status = document['status']
                 clientid = document['clientId']
                 taskid = document['taskId']
+                uploaddir = document['uploadDir']
                 # call insert_document_info
-                self.__insert_document_info(taskid, document_path, status, clientid)
+                self.__insert_document_info(taskid, document_path, status, clientid, uploaddir)
                 document_sub_path = ""
                 document_path = ""
                 document_path_list = []
@@ -48,7 +49,7 @@ class FilterInProgress:
     
     # Insert new IN_PROGRESS document information in ocrrworkspace-ocrr.
     # Put the document path in a queue
-    def __insert_document_info(self, taskid, document_path, status, clientid):
+    def __insert_document_info(self, taskid, document_path, status, clientid, uploaddir):
         # Call query_taskid
         if self.__query_taskid(taskid):
             document = {
@@ -56,7 +57,8 @@ class FilterInProgress:
                 "path": document_path,
                 "status": status,
                 "clientId": clientid,
-                "taskResult": ""
+                "taskResult": "",
+                "uploadDir": uploaddir
             }
             self.collection_ocrrworkspace.insert_one(document)
             self.inprogress_queue.put(document_path)
@@ -67,5 +69,4 @@ class FilterInProgress:
         result = self.collection_ocrrworkspace.find_one(query)
         if not result:
             return True
-        else:
-            return False
+        return False

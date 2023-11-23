@@ -8,6 +8,7 @@ from pancard.write_xml_data import WritePanCardXMLData
 from aadhaarcard.write_eaadhaarcard_xml_data import WriteEAadhaarCardXMLData
 from aadhaarcard.write_aadhaarcaard_front_xml_data import WriteAadhaarCardFrontXMLData
 from document_db.update_ocrrworkspace import UpdateDocumentStatus
+from rejected_redacted.redacted_rejected_document import RedactRejectedDocument
 
 
 class WriteXMLDatas:
@@ -78,6 +79,10 @@ class WriteXMLDatas:
         return document_dict
 
     def __rejected(self, get_doc_dict: dict, document_path: str, error_code: str):
+        # Redact 75% of the image
+        redact_rejected_doc = RedactRejectedDocument(get_doc_dict["original_document_path"])
+        redact_rejected_doc.rejected()
+
         # Move the original document to Rejected folder
         shutil.move(get_doc_dict["original_document_path"], os.path.join(get_doc_dict["document_rejected_path"], get_doc_dict["original_document_name"]))
         path = Path(document_path)

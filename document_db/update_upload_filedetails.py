@@ -26,9 +26,11 @@ class UpdateUploadFileDetailsDB:
                     "uploadDir": document["uploadDir"]
                 }
                 if self.__update_upload_filedetails(docs):
-                    if self.__webhook_post_request(client_id, docs):
-                        remove_query = {"taskId": document['taskId']}
-                        collection.delete_one(remove_query)
+                    remove_query = {"taskId": document['taskId']}
+                    collection.delete_one(remove_query)
+                    # if self.__webhook_post_request(client_id, docs):
+                    #     remove_query = {"taskId": document['taskId']}
+                    #     collection.delete_one(remove_query)
             sleep(5)
     
     def __update_upload_filedetails(self, docinfo: dict) -> bool:

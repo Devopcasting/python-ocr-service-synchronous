@@ -5,6 +5,8 @@ from helpers.xmldata import WriteXML
 import os
 import shutil
 from pathlib import Path
+from rejected_redacted.redacted_rejected_document import RedactRejectedDocument
+
 
 class WritePanCardXMLData:
     def __init__(self, get_doc_dict: dict, document_path: str, upload_path: str) -> None:
@@ -44,6 +46,10 @@ class WritePanCardXMLData:
         UpdateDocumentStatus(self.get_doc_dict["original_document_path"], "REDACTED", "Uploaded Successfully").update_status()
     
     def __rejected(self, error_code: str):
+        # Redact 75% of the image
+        redact_rejected_doc = RedactRejectedDocument(self.get_doc_dict["original_document_path"])
+        redact_rejected_doc.rejected()
+        
         # Move the original document to Rejected folder
         shutil.move(self.get_doc_dict["original_document_path"], os.path.join(self.get_doc_dict["document_rejected_path"], self.get_doc_dict["original_document_name"]))
         path = Path(self.document_path)
@@ -51,4 +57,8 @@ class WritePanCardXMLData:
         self.logger.error(f"| Document Rejected with error {error_code}: {self.get_doc_dict["original_document_path"]}")
         # Update status of ocrrworkspace-ocrr
         UpdateDocumentStatus(self.get_doc_dict["original_document_path"], "REJECTED", error_code).update_status()
+    
+  
+       
+
 

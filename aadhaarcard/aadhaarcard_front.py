@@ -24,7 +24,7 @@ class AadhaarCardFrontInfo:
                                                      
         # Set document original path
         document_name_list = os.path.basename(document_path).split('_')
-        original_document_name = document_name_list[2]
+        original_document_name = document_name_list[2]+'_'+document_name_list[3]
         self.original_document_path = upload_path+"\\"+document_name_list[0]+"\\"+document_name_list[1]+"\\"+original_document_name
 
     

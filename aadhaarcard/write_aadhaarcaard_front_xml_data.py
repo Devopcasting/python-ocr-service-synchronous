@@ -49,9 +49,11 @@ class WriteAadhaarCardFrontXMLData:
     
     def __rejected(self, error_code: str):
         if os.path.exists(self.document_path):
-            # Redact 75% of the image
+            # Get 75% redacted coordinates of the image
             redact_rejected_doc = RedactRejectedDocument(self.get_doc_dict["original_document_path"])
-            redact_rejected_doc.rejected()
+            coordinates_list = redact_rejected_doc.rejected()
+            write_xml = WriteXML(self.get_doc_dict["document_rejected_path"], self.get_doc_dict["original_document_name"], coordinates_list)
+            write_xml.writexml()
             
             # Move the original document to Rejected folder
             shutil.move(self.get_doc_dict["original_document_path"], os.path.join(self.get_doc_dict["document_rejected_path"], self.get_doc_dict["original_document_name"]))

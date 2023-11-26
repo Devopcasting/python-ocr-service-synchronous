@@ -13,6 +13,7 @@ class FilterInProgress:
         # Select upload db
         db_upload = client["upload"]
         self.collection_upload = db_upload['fileDetails']
+
         # Select ocrrworkspace db
         db_ocrrworkspace = client['ocrrworkspace']
         self.collection_ocrrworkspace = db_ocrrworkspace['ocrr']
@@ -30,11 +31,12 @@ class FilterInProgress:
             document_path_list = []
             for document in documents:
                 document_path_list = document['uploadDir'].split('/')
-                index = document_path_list.index("Upload")
-                for i in range(index + 1, len(document_path_list)):
-                    document_sub_path += '\\'+document_path_list[i]
+                for i in range(len(document_path_list)):
+                    if len(document_path_list[i]) !=0:    
+                        document_sub_path += '\\'+document_path_list[i]
 
                 document_path = self.upload_path+document_sub_path
+                print(document_path)
                 status = document['status']
                 clientid = document['clientId']
                 taskid = document['taskId']
@@ -44,8 +46,7 @@ class FilterInProgress:
                 document_sub_path = ""
                 document_path = ""
                 document_path_list = []
-            sleep(2)
-
+            sleep(5)
     
     # Insert new IN_PROGRESS document information in ocrrworkspace-ocrr.
     # Put the document path in a queue
@@ -62,6 +63,8 @@ class FilterInProgress:
             }
             self.collection_ocrrworkspace.insert_one(document)
             self.inprogress_queue.put(document_path)
+            # Update the IN_PROGRESS status
+            self.__update_in_progress_status(taskid)
 
     # Check if the taskId already available in ocrrworkspace-ocrr
     def __query_taskid(self, taskid) -> bool:
@@ -70,3 +73,9 @@ class FilterInProgress:
         if not result:
             return True
         return False
+
+    # Update the status from IN_PROGRESS to  IN_QUEUE
+    def __update_in_progress_status(self, taskid):
+        query = {"taskId": taskid}
+        update = {"$set":{"status": "IN_QUEUE"}}
+        self.collection_upload.update_one(query, update)

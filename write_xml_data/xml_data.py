@@ -9,7 +9,7 @@ from aadhaarcard.write_eaadhaarcard_xml_data import WriteEAadhaarCardXMLData
 from aadhaarcard.write_aadhaarcaard_front_xml_data import WriteAadhaarCardFrontXMLData
 from document_db.update_ocrrworkspace import UpdateDocumentStatus
 from rejected_redacted.redacted_rejected_document import RedactRejectedDocument
-
+from helpers.xmldata import WriteXML
 
 class WriteXMLDatas:
     def __init__(self,  processed_doc_queue: object, upload_path: str) -> None:
@@ -66,7 +66,7 @@ class WriteXMLDatas:
 
     def __set_orginal_doc_dict(self, document_path) -> dict:
         document_name_list = os.path.basename(document_path).split('_')
-        original_document_name = document_name_list[2]
+        original_document_name = document_name_list[2]+'_'+document_name_list[3]
         original_document_path = self.upload_path+"\\"+document_name_list[0]+"\\"+document_name_list[1]+"\\"+original_document_name
         document_redacted_path = self.upload_path+"\\"+document_name_list[0]+"\\"+document_name_list[1]+"\\Redacted"
         document_rejected_path = self.upload_path+"\\"+document_name_list[0]+"\\"+document_name_list[1]+"\\Rejected"
@@ -79,9 +79,11 @@ class WriteXMLDatas:
         return document_dict
 
     def __rejected(self, get_doc_dict: dict, document_path: str, error_code: str):
-        # Redact 75% of the image
+        # Get 75% redacted coordinates of the image
         redact_rejected_doc = RedactRejectedDocument(get_doc_dict["original_document_path"])
-        redact_rejected_doc.rejected()
+        coordinates_list = redact_rejected_doc.rejected()
+        write_xml = WriteXML(get_doc_dict["document_rejected_path"], get_doc_dict["original_document_name"], coordinates_list)
+        write_xml.writexml()
 
         # Move the original document to Rejected folder
         shutil.move(get_doc_dict["original_document_path"], os.path.join(get_doc_dict["document_rejected_path"], get_doc_dict["original_document_name"]))

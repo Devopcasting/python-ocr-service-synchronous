@@ -1,19 +1,22 @@
-from PIL import Image, ImageDraw
+import numpy as np
+import cv2
 
 class RedactRejectedDocument:
     def __init__(self, image_path) -> None:
         self.image_path = image_path
     
-    def rejected(self):
-        image = Image.open(self.image_path)
-        # Get the dimensions of the image
-        width, height = image.size
-        # Create a new image with the same size and a white background
-        redacted_image = Image.new("RGB", (width, height), "black")
-        # Get a draw object to manipulate the new image
-        draw = ImageDraw.Draw(redacted_image)
-        # Redact 75% of the image horizontally
-        redacted_width = int(height * 0.30)
-        # Paste the unredacted part onto the new image
-        redacted_image.paste(image.crop((0, 0, width, redacted_width)), (0, 0))
-        redacted_image.save(self.image_path)
+    """Get 75% document coordinates"""
+    def rejected(self) -> list:
+        # Read the image
+        image = cv2.imread(self.image_path)
+        # Get the image height and width
+        height, width = image.shape[:2]
+        # Calculate the coordinates of the 75% of the image
+        x1 = 0
+        y1 = 0
+        x2 = width
+        y2 = int(height * 0.875)
+        coordinates_list = []
+        coordinates_list.append([x1, y1, x2, y2])
+        return coordinates_list
+       

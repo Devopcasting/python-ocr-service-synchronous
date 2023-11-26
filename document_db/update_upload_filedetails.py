@@ -50,12 +50,12 @@ class UpdateUploadFileDetailsDB:
         # Filter the clientId from upload:webhook
         filter_query = {"clientId": clientid}
         database = self.client["upload"]
-        collection = database["webhook"]
+        collection = database["webhooks"]
         client_doc = collection.find_one(filter_query)
 
         WEBHOOK_URL = client_doc["url"]
         HEADER = {'Content-Type': 'application/json'}
-        response = requests.post(WEBHOOK_URL+"/processstatus", data=json.dumps(payload), headers=HEADER)
+        response = requests.post(WEBHOOK_URL+"/CVCore/processstatus", data=json.dumps(payload), headers=HEADER)
         if response.status_code == 201 or response.status_code == 200 :
             return True
         return False

@@ -1,4 +1,5 @@
 import os
+import re
 import xml.etree.ElementTree as ET
 
 class WriteXML:
@@ -6,7 +7,11 @@ class WriteXML:
         self.xml_path = redacted_path
         self.xml_file_name = original_document_name
         self.content = ocr_obj_info
-    
+
+        # Get Document ID
+        doc_id_num = re.split('_', self.xml_file_name)[0]
+        self.doc_id = doc_id_num[:-1]
+
     def writexml(self) -> bool:
         # Set XML file path
         xml_file_path = os.path.join(self.xml_path, self.xml_file_name.split('.')[0]+'.xml')
@@ -18,7 +23,7 @@ class WriteXML:
         count_index = 1
         for i in self.content:
             x1, y1, x2, y2 = i
-            data.append(f'0,0,0,,,,0,0,0,0,0,0,,vv,cvadmin,vv,0,1,0,{count_index},{x1},{y1},{x2},{y2},0,0,')
+            data.append(f'0,0,0,,,,0,0,0,0,0,0,,vv,cvadmin,vv,0,{self.doc_id},0,{count_index},{x1},{y1},{x2},{y2},0,0,')
             x1, y1, x2, y2 = [0, 0, 0, 0]
             count_index = count_index + 1
         # Create the root element    

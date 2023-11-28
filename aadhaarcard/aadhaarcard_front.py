@@ -109,7 +109,9 @@ class AadhaarCardFrontInfo:
         
         # Reverse loop from Male/Female index until DOB comes
         for i in range(matching_index, -1, -1):
-            if re.match(r'^\d{2}/\d{2}/\d{4}$', self.coordinates[i][4]) or re.match(r'^\d{4}$', self.coordinates[i][4]):
+            if re.match(r'^\d{4}$', self.coordinates[i][4]):
+                return result
+            if re.match(r'^\d{2}/\d{2}/\d{4}$', self.coordinates[i][4]):
                 dob_coordinates = [self.coordinates[i][0], self.coordinates[i][1], self.coordinates[i][2], self.coordinates[i][3]]
                 break
         if not dob_coordinates:

@@ -36,7 +36,6 @@ class FilterInProgress:
                         document_sub_path += '\\'+document_path_list[i]
 
                 document_path = self.upload_path+document_sub_path
-                print(document_path)
                 status = document['status']
                 clientid = document['clientId']
                 taskid = document['taskId']

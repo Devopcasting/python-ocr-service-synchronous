@@ -66,7 +66,7 @@ class OCRREngine:
 if __name__ == '__main__':
     # Read config.ini
     config = configparser.ConfigParser(allow_no_value=True)
-    config.read(r'C:\Users\pokhriyal\Desktop\Minimal\config.ini')
+    config.read(r'C:\Program Files (x86)\OCRR\config.ini')
     # Set Path vars
     upload_path = config['Paths']['upload']
     workspace_path = config['Paths']['workspace']

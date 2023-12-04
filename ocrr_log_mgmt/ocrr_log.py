@@ -7,7 +7,7 @@ class OCRREngineLogging:
         # create a ConfigParser object with the allow_no_value keyword argument
         config = configparser.ConfigParser(allow_no_value=True)
         # read config.ini
-        config.read(r'C:\Users\pokhriyal\Desktop\Minimal\config.ini')
+        config.read(r'C:\Program Files (x86)\OCRR\config.ini')
         occr_log_path = config['Paths']['logs']
 
         self.log_file = os.path.join(occr_log_path,log_file)

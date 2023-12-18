@@ -14,3 +14,4 @@ class CleanText:
             if len(right_strip) != 0:
                 clean_data.append(right_strip)
         return clean_data
+

@@ -7,7 +7,6 @@ class WriteXML:
         self.xml_path = redacted_path
         self.xml_file_name = original_document_name
         self.content = ocr_obj_info
-
         # Get Document ID
         doc_id_num = re.split('_', self.xml_file_name)[0]
         self.doc_id = doc_id_num[:-1]

@@ -14,8 +14,8 @@ class PancardDocumentInfo:
         self.logger = log_config.configure_logger()
 
         # Set document original path
-        document_name_list = os.path.basename(document_path).split('_')
-        original_document_name = document_name_list[2]+'_'+document_name_list[3]
+        document_name_list = os.path.basename(document_path).split('+')
+        original_document_name = document_name_list[2]
         self.original_document_path = upload_path+"\\"+document_name_list[0]+"\\"+document_name_list[1]+"\\"+original_document_name
 
         # Get the coordinates of all the extracted text
@@ -53,7 +53,7 @@ class PancardDocumentInfo:
         
         width = matching_pan_num_coord[2] - matching_pan_num_coord[0]
         result = [matching_pan_num_coord[0], matching_pan_num_coord[1], 
-                  matching_pan_num_coord[0] + int(0.56 * width), matching_pan_num_coord[3]]
+                  matching_pan_num_coord[0] + int(0.65 * width), matching_pan_num_coord[3]]
         return result
     
       

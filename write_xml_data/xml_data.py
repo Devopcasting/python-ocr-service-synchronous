@@ -7,6 +7,7 @@ from ocrr_log_mgmt.ocrr_log import OCRREngineLogging
 from pancard.write_xml_data import WritePanCardXMLData
 from aadhaarcard.write_eaadhaarcard_xml_data import WriteEAadhaarCardXMLData
 from aadhaarcard.write_aadhaarcaard_front_xml_data import WriteAadhaarCardFrontXMLData
+from passport.write_xml_data import WritePassportXMLData
 from document_db.update_ocrrworkspace import UpdateDocumentStatus
 from rejected_redacted.redacted_rejected_document import RedactRejectedDocument
 from helpers.xmldata import WriteXML
@@ -39,6 +40,9 @@ class WriteXMLDatas:
                         self.__process_aadhaarcard_front(get_doc_dict, document_path)
                     else:
                         self.__rejected(get_doc_dict, document_path, "ERRAAD7")
+                # Identify document: Passport
+                elif document_obj.identify_passport():
+                    self.__process_passport(get_doc_dict, document_path)
                 else:
                     self.__rejected(get_doc_dict, document_path, "ERRDOC1")
             sleep(10)
@@ -58,11 +62,20 @@ class WriteXMLDatas:
             self.logger.error(f"| Error performing OCR: {document_path}")
 
     def __process_aadhaarcard_front(self, get_doc_dict, document_path):
-        # Perform OCR and Write XM
+        # Perform OCR and Write XML
         if WriteAadhaarCardFrontXMLData(get_doc_dict, document_path, self.upload_path).writexmldata():
             self.logger.info(f"| OCR successful: {document_path}")
         else:
             self.logger.error(f"| Error performing OCR: {document_path}")
+    
+    def __process_passport(self, get_doc_dict, document_path):
+        # Perform OCR and Write XML
+        if WritePassportXMLData(get_doc_dict, document_path, self.upload_path).writexmldata():
+            self.logger.info(f"| OCR successful: {document_path}")
+        else:
+            self.logger.error(f"| Error performing OCR: {document_path}")
+
+
 
     def __set_orginal_doc_dict(self, document_path) -> dict:
         document_name_list = os.path.basename(document_path).split('+')

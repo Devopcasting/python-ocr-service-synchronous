@@ -23,8 +23,8 @@ class AadhaarCardFrontInfo:
         self.text_lang = pytesseract.image_to_string(self.document_path, lang="hin+eng")
                                                      
         # Set document original path
-        document_name_list = os.path.basename(document_path).split('_')
-        original_document_name = document_name_list[2]+'_'+document_name_list[3]
+        document_name_list = os.path.basename(document_path).split('+')
+        original_document_name = document_name_list[2]
         self.original_document_path = upload_path+"\\"+document_name_list[0]+"\\"+document_name_list[1]+"\\"+original_document_name
 
     

@@ -74,5 +74,5 @@ class ProcessDocuments:
 
     def __rename_doc(self, document_path) -> str:
         renamed_doc_list = document_path.split("\\")
-        renamed_doc = renamed_doc_list[-3]+"_"+renamed_doc_list[-2]+"_"+renamed_doc_list[-1]
+        renamed_doc = renamed_doc_list[-3]+"+"+renamed_doc_list[-2]+"+"+renamed_doc_list[-1]
         return renamed_doc

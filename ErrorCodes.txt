@@ -24,3 +24,12 @@ ERRAAD4 = Aadhaarcard name in native language
 ERRAAD5 = Aadhaarcard OCR
 ERRAAD6 = Aadhaarcard XML
 ERRAAD7 = Invalid Aadhaarcard
+
+[Passport]
+ERRPASS1 = Passport number
+ERRPASS2 = Dates
+ERRPASS3 = Gender
+ERRPASS4 = Surname
+ERRPASS5 = Given Name
+ERRPASS6 = IND Name
+ERRPASS7 = Pin Number

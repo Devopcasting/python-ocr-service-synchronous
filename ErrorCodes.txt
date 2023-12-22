@@ -32,4 +32,6 @@ ERRPASS3 = Gender
 ERRPASS4 = Surname
 ERRPASS5 = Given Name
 ERRPASS6 = IND Name
-ERRPASS7 = Pin Number
+ERRPASS7 = Father Name
+ERRPASS8 = Mother Name
+ERRPASS9 = Pin Number

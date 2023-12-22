@@ -18,7 +18,7 @@ class PassportDocumentInfo:
 
         # Get the coordinates of all the extracted text
         self.coordinates = TextCoordinates(document_path, doc_type="passport").generate_text_coordinates()
-        print(self.coordinates)
+    
         # Get the texts from document
         tesseract_config = r'-l eng --oem 3 --psm 11'
         self.text = pytesseract.image_to_string(document_path, config=tesseract_config)
@@ -109,7 +109,7 @@ class PassportDocumentInfo:
         matching_line_index = self.__find_matching_line_index(lines, matching_text)
         if matching_line_index == 0:
             return result
-        print(lines)
+        
         # get the next line in the text
         next_line_list = []
         for line in lines[matching_line_index + 2 :]:
@@ -167,6 +167,76 @@ class PassportDocumentInfo:
 
         return result
     
+    def __extract_father_name(self):
+        matching_text = "Father"
+        father_name = []
+        result = []
+
+        # split the text into lines
+        lines = [i for i in self.text.splitlines() if len(i) != 0]
+
+        # find the line that matches search text
+        matching_line_index = self.__find_matching_line_index(lines, matching_text)
+        if matching_line_index == 0:
+            return result
+
+        # get the next line in the text
+        next_line_list = []
+        for line in lines[matching_line_index + 1 :]:
+            if "mother" in line.lower():
+                break
+            else:
+                next_line_list.extend(line.split())
+
+        if not next_line_list:
+            return result
+
+        for i in next_line_list:
+            for k, (x1, y1, x2, y2, text) in enumerate(self.coordinates):
+                if i == text:
+                    father_name.append([x1, y1, x2, y2])
+        
+        for i in father_name:
+            width = i[2] - i[0]
+            result.append([i[0], i[1], i[0] + int(0.40 * width), i[3]])
+        
+        return result
+
+    def __extract_mother_name(self):
+        matching_text = "Mother"
+        mother_name = []
+        result = []
+
+        # split the text into lines
+        lines = [i for i in self.text.splitlines() if len(i) != 0]
+
+        # find the line that matches search text
+        matching_line_index = self.__find_matching_line_index(lines, matching_text)
+        if matching_line_index == 0:
+            return result
+
+        # get the next line in the text
+        next_line_list = []
+        for line in lines[matching_line_index + 1 :]:
+            if "af ar of a ora /name of spouse" in line.lower():
+                break
+            else:
+                next_line_list.extend(line.split())
+
+        if not next_line_list:
+            return result
+
+        for i in next_line_list:
+            for k, (x1, y1, x2, y2, text) in enumerate(self.coordinates):
+                if i == text:
+                    mother_name.append([x1, y1, x2, y2])
+        
+        for i in mother_name:
+            width = i[2] - i[0]
+            result.append([i[0], i[1], i[0] + int(0.40 * width), i[3]])
+        
+        return result
+
     def __extract_address(self):
         matching_text = 'Address'
         result = []
@@ -284,23 +354,49 @@ class PassportDocumentInfo:
             return passport_doc_info_list
         passport_doc_info_list.extend(passport_ind_name)
 
+        # Collect: Father Name
+        passport_father_name = self.__extract_father_name()
+        if not passport_father_name:
+            self.logger.error(f"| Document Rejected with error ERRPASS7: {self.original_document_path}")
+            UpdateDocumentStatus(self.original_document_path, "REJECTED", "ERRPASS7").update_status()
+            passport_doc_info_list = []
+            return passport_doc_info_list
+        passport_doc_info_list.extend(passport_father_name)
+
+        # Collect: Mother Name
+        passport_mother_name = self.__extract_mother_name()
+        if not passport_mother_name:
+            self.logger.error(f"| Document Rejected with error ERRPASS8: {self.original_document_path}")
+            UpdateDocumentStatus(self.original_document_path, "REJECTED", "ERRPASS8").update_status()
+            passport_doc_info_list = []
+            return passport_doc_info_list
+        passport_doc_info_list.extend(passport_mother_name)
+
         # Collect: Address
-        # passport_address = self.__extract_address()
-        # if not passport_address:
-        #     self.logger.error(f"| Document Rejected with error ERRPASS7: {self.original_document_path}")
-        #     UpdateDocumentStatus(self.original_document_path, "REJECTED", "ERRPASS7").update_status()
-        #     passport_doc_info_list = []
-        #     return passport_doc_info_list
-        # passport_doc_info_list.extend(passport_address)
+        passport_address = self.__extract_address()
+        if not passport_address:
+            self.logger.error(f"| Document Rejected with error ERRPASS7: {self.original_document_path}")
+            UpdateDocumentStatus(self.original_document_path, "REJECTED", "ERRPASS7").update_status()
+            passport_doc_info_list = []
+            return passport_doc_info_list
+        passport_doc_info_list.extend(passport_address)
 
         # Collect: Pin Number
         passport_pin_number = self.__extract_pin_number()
         if not passport_pin_number:
-            self.logger.error(f"| Document Rejected with error ERRPASS6: {self.original_document_path}")
-            UpdateDocumentStatus(self.original_document_path, "REJECTED", "ERRPASS6").update_status()
+            self.logger.error(f"| Document Rejected with error ERRPASS9: {self.original_document_path}")
+            UpdateDocumentStatus(self.original_document_path, "REJECTED", "ERRPASS9").update_status()
             passport_doc_info_list = []
             return passport_doc_info_list
         passport_doc_info_list.extend(passport_pin_number)
 
-        return passport_doc_info_list
+        # Remove duplicate list of lists
+        if not passport_doc_info_list:
+            return passport_doc_info_list
+        else:
+            unique_list = []
+            for i in passport_doc_info_list:
+                if i not in unique_list:
+                    unique_list.append(i)
+            return unique_list
 

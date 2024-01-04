@@ -120,32 +120,30 @@ class EAadhaarCardInfo:
     
     # func: collect aadhaar card number
     def __extract_eaadharcard_number(self, matching_text: str) -> list:
-        text = [ i for i in self.text_eng.split("\n") if len(i) != 0 ]
+        text_result = []
+        matching_index = 0
         result = []
-        eaadhaar_num = None
-        eaadhaar_coords = []
 
-        for i, line in enumerate(text):
-            if matching_text in line:
-                eaadhaar_num = text[i + 1].split()
-                eaadhaar_num = [ i for i in eaadhaar_num if i.isdigit() and len(i) == 4]
+        for i,(x1,y1,x2,y2,text) in enumerate(self.coordinates):
+            if text.lower() in ["male", "female"]:
+                matching_index = i
+        if not matching_index:
+            return result
+        
+        for i in range(matching_index, len(self.coordinates)):
+            text = self.coordinates[i][4]
+            if len(text) == 4 and text.isdigit():
+                text_result.append((text))
+            if len(text_result) == 3:
                 break
-        if eaadhaar_num is None or len(eaadhaar_num) < 3:
-            return result
         
-        # get the coordinates
-        for i,(x1, y1, x2, y2, t) in enumerate(self.coordinates):
-            if t in eaadhaar_num:
-                eaadhaar_coords.append([x1, y1, x2, y2])
-        if len(eaadhaar_coords) != 6:
-            return result
-        
-        # combine coordinates
-        result.append([eaadhaar_coords[0][0], eaadhaar_coords[0][1], eaadhaar_coords[1][2], eaadhaar_coords[1][3]])
-        result.append([eaadhaar_coords[3][0], eaadhaar_coords[3][1], eaadhaar_coords[4][2], eaadhaar_coords[4][3]])
-
+        for i in text_result[:-1]:
+            for k,(x1,y1,x2,y2,text) in enumerate(self.coordinates):
+                if i == text:
+                    result.append([x1,y1,x2,y2])
         return result
-    
+
+        
     # func: collect E-Aadhaar card information
     def collect_eaadhaarcard_info(self):
         eaadhaarcard_info_list = []

@@ -6,9 +6,7 @@ class WriteXML:
     def __init__(self, redacted_path: str, original_document_name: str, ocr_obj_info: list) -> None:
         self.xml_path = redacted_path
         self.xml_file_name = original_document_name
-        self.content = ocr_obj_info
-       
-         
+        self.content = ocr_obj_info 
 
     def writexml(self) -> bool:
 
@@ -39,6 +37,7 @@ class WriteXML:
             data.append(f'0,0,0,,,,0,0,0,0,0,0,,vv,CVDPS,vv,{frame_id},{doc_id},0,{count_index},{x1},{y1},{x2},{y2},0,0,')
             x1, y1, x2, y2 = [0, 0, 0, 0]
             count_index = count_index + 1
+            
         # Create the root element    
         root = ET.Element("DataBase")
 

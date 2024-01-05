@@ -62,8 +62,8 @@ class EAadhaarCardInfo:
         for i,(x1, y1, x2, y2, text) in enumerate(coords):
             if text in matching_text:
                 result.append([x1, y1, x2, y2])
-            if len(matching_text) == len(result):
-                break
+            # if len(matching_text) == len(result):
+            #     break
         return result
         
     # func: extract dob

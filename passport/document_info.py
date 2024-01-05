@@ -292,7 +292,7 @@ class PassportDocumentInfo:
         
         for i in pin_coords:
             width = i[2] - i[0]
-            result.append([i[0], i[1], i[0] + int(0.10 * width), i[3]])
+            result.append([i[0], i[1], i[0] + int(0.30 * width), i[3]])
         
         return result
 

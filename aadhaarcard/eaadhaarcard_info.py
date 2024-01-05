@@ -21,7 +21,14 @@ class EAadhaarCardInfo:
 
         self.text_eng = pytesseract.image_to_string(self.document_path)
         self.text_lang = pytesseract.image_to_string(self.document_path, lang="hin+eng")
-                                                     
+
+        self.states = ['andhra pradesh', 'arunachal pradesh', 'assam', 'bihar', 'chandigarh (ut)', 
+                       'chhattisgarh', 'dadra and nagar haveli (ut)', 'daman and diu (ut)', 'delhi (nct)', 
+                       'goa', 'gujarat', 'haryana', 'himachal pradesh', 'jammu and kashmir', 'jharkhand', 
+                       'karnataka', 'kerala', 'lakshadweep (ut)', 'madhya pradesh', 'maharashtra', 'manipur', 
+                       'meghalaya', 'mizoram', 'nagaland', 'odisha', 'puducherry (ut)', 'punjab', 'rajasthan', 
+                       'sikkim', 'tamil nadu', 'telangana', 'tripura', 'uttarakhand', 'uttar pradesh']
+                                                
         # Set document original path
         document_name_list = os.path.basename(document_path).split('+')
         original_document_name = document_name_list[2]
@@ -177,6 +184,15 @@ class EAadhaarCardInfo:
         result = [pincode_coords[0], pincode_coords[1], pincode_coords[0] + int(0.30 * width), pincode_coords[3]]
         return result
     
+    # func: collect state name
+    def __extract_state(self):
+        result = []
+        for i,(x1, y1, x2, y2, text) in enumerate(self.coordinates):
+            if text.lower() in self.states:
+                result.append([x1, y1, x2, y2])
+        
+        return result
+    
     # func: collect E-Aadhaar card information
     def collect_eaadhaarcard_info(self):
         eaadhaarcard_info_list = []
@@ -229,5 +245,10 @@ class EAadhaarCardInfo:
         pincode_number = self.__extract_pincode_number()
         if pincode_number:
             eaadhaarcard_info_list.append(pincode_number)
+
+        # Collect: State name
+        state_name = self.__extract_state()
+        if state_name:
+            eaadhaarcard_info_list.extend(state_name)
 
         return eaadhaarcard_info_list

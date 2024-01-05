@@ -19,6 +19,13 @@ class PassportDocumentInfo:
         # Get the coordinates of all the extracted text
         self.coordinates = TextCoordinates(document_path, doc_type="passport").generate_text_coordinates()
     
+        self.states = ['andhra pradesh', 'arunachal pradesh', 'assam', 'bihar', 'chandigarh (ut)', 
+                       'chhattisgarh', 'dadra and nagar haveli (ut)', 'daman and diu (ut)', 'delhi (nct)', 
+                       'goa', 'gujarat', 'haryana', 'himachal pradesh', 'jammu and kashmir', 'jharkhand', 
+                       'karnataka', 'kerala', 'lakshadweep (ut)', 'madhya pradesh', 'maharashtra', 'manipur', 
+                       'meghalaya', 'mizoram', 'nagaland', 'odisha', 'puducherry (ut)', 'punjab', 'rajasthan', 
+                       'sikkim', 'tamil nadu', 'telangana', 'tripura', 'uttarakhand', 'uttar pradesh']
+        
         # Get the texts from document
         tesseract_config = r'-l eng --oem 3 --psm 11'
         self.text = pytesseract.image_to_string(document_path, config=tesseract_config)
@@ -296,6 +303,15 @@ class PassportDocumentInfo:
         
         return result
 
+    # func: collect state name
+    def __extract_state(self):
+        result = []
+        for i,(x1, y1, x2, y2, text) in enumerate(self.coordinates):
+            if text.lower() in self.states:
+                result.append([x1, y1, x2, y2])
+        
+        return result
+    
         
     # func: collect pancard information
     def collect_passport_info(self) -> list:
@@ -383,12 +399,13 @@ class PassportDocumentInfo:
 
         # Collect: Pin Number
         passport_pin_number = self.__extract_pin_number()
-        if not passport_pin_number:
-            self.logger.error(f"| Document Rejected with error ERRPASS9: {self.original_document_path}")
-            UpdateDocumentStatus(self.original_document_path, "REJECTED", "ERRPASS9").update_status()
-            passport_doc_info_list = []
-            return passport_doc_info_list
-        passport_doc_info_list.extend(passport_pin_number)
+        if passport_pin_number:
+            passport_doc_info_list.extend(passport_pin_number)
+
+        # Collect: State name
+        state_name = self.__extract_state()
+        if state_name:
+            passport_doc_info_list.extend(state_name)
 
         # Remove duplicate list of lists
         if not passport_doc_info_list:

@@ -22,7 +22,6 @@ class WriteEAadhaarCardXMLData:
         # Perform OCR
         ocrr = EAadhaarCardInfo(self.document_path, self.upload_path)
         ocrr_info = ocrr.collect_eaadhaarcard_info()
-
         if ocrr_info:
             write_xml = WriteXML(self.get_doc_dict["document_redacted_path"], self.get_doc_dict["original_document_name"], ocrr_info )
             if write_xml.writexml():

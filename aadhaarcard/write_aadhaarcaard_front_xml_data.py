@@ -23,7 +23,6 @@ class WriteAadhaarCardFrontXMLData:
         # Perform OCR
         ocrr = AadhaarCardFrontInfo(self.document_path, self.upload_path)
         ocrr_info = ocrr.collect_aadhaarcard_front_info()
-
         if ocrr_info:
             write_xml = WriteXML(self.get_doc_dict["document_redacted_path"], self.get_doc_dict["original_document_name"], ocrr_info )
             if write_xml.writexml():

@@ -143,7 +143,40 @@ class EAadhaarCardInfo:
                     result.append([x1,y1,x2,y2])
         return result
 
+    # func: collect mobile number
+    def __extract_mobile_number(self):
+        result = []
+        mobile_coords = []
+
+        for i,(x1, y1, x2, y2,text) in enumerate(self.coordinates):
+            if len(text) == 10 and text.isdigit():
+                mobile_coords = [x1, y1, x2, y2]
+                break
+        if not mobile_coords:
+            return result
         
+        # Get first 6 chars
+        width = mobile_coords[2] - mobile_coords[0]
+        result = [mobile_coords[0], mobile_coords[1], mobile_coords[0] + int(0.54 * width), mobile_coords[3]]
+        return result
+    
+    # func: collect pin code number
+    def __extract_pincode_number(self):
+        result = []
+        pincode_coords = []
+
+        for i,(x1, y1, x2, y2, text) in enumerate(self.coordinates):
+            if len(text) == 6 and text.isdigit():
+                pincode_coords = [x1, y1, x2, y2]
+                break
+        if not pincode_coords:
+            return result
+        
+        # Get first 3 chars
+        width = pincode_coords[2] - pincode_coords[0]
+        result = [pincode_coords[0], pincode_coords[1], pincode_coords[0] + int(0.30 * width), pincode_coords[3]]
+        return result
+    
     # func: collect E-Aadhaar card information
     def collect_eaadhaarcard_info(self):
         eaadhaarcard_info_list = []
@@ -186,5 +219,15 @@ class EAadhaarCardInfo:
             eaadhaarcard_info_list = []
             return eaadhaarcard_info_list
         eaadhaarcard_info_list.extend(e_aadhaar_card_num)
+
+        # Collect: Mobile number
+        mobile_number = self.__extract_mobile_number()
+        if mobile_number:
+            eaadhaarcard_info_list.append(mobile_number)
+        
+        # Collect: Pin Code number
+        pincode_number = self.__extract_pincode_number()
+        if pincode_number:
+            eaadhaarcard_info_list.append(pincode_number)
 
         return eaadhaarcard_info_list
